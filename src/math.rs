@@ -1,3 +1,5 @@
+use std::f32::consts::E;
+
 struct Matrix(Vec<Vec<f32>>);
 struct Vector(Vec<f32>);
 
@@ -63,4 +65,24 @@ fn dot_test() {
 
 fn dot(a: &Vec<f32>, b: &Vec<f32>) -> f32 {
     a.iter().zip(b).fold(0.0, |sum, (x, y)| sum + (x * y))
+}
+
+#[test]
+fn logistic_curve_test() {
+    let x = -0.31;
+    assert_mostly_eq(0.4231147, logistic_curve(x), 0.005);
+}
+
+fn logistic_curve(x: f32) -> f32 {
+    1.0 / (1.0 + (E.powf(-x)))
+}
+
+#[test]
+fn logistic_curve_dx_test() {
+    let x = 2.88;
+    assert_mostly_eq(0.050326, logistic_curve_dx(x), 0.005);
+}
+
+fn logistic_curve_dx(x: f32) -> f32 {
+    logistic_curve(x) * (1.0 - logistic_curve(x))
 }
