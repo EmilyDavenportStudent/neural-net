@@ -1,3 +1,4 @@
+mod math;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::f32::consts::E;
