@@ -1,6 +1,8 @@
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 
+#[derive(Debug)]
 pub struct Matrix<const N: usize, const M: usize>([[f32; M]; N]);
+#[derive(Debug)]
 pub struct Vector<const N: usize>([f32; N]);
 
 #[test]
