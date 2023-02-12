@@ -1,5 +1,7 @@
-struct Matrix<const N: usize, const M: usize>([[f32; M]; N]);
-struct Vector<const N: usize>([f32; N]);
+use rand::{rngs::SmallRng, Rng, SeedableRng};
+
+pub struct Matrix<const N: usize, const M: usize>([[f32; M]; N]);
+pub struct Vector<const N: usize>([f32; N]);
 
 #[test]
 fn times_vector_test() {
@@ -8,6 +10,18 @@ fn times_vector_test() {
     let result = A.times_vector(&v);
     assert_mostly_eq(1., result.0[0], 0.005);
     assert_mostly_eq(-3., result.0[1], 0.005);
+}
+
+#[test]
+fn new_with_rng_test() {
+    let mut rng = SmallRng::seed_from_u64(69);
+    let A = Matrix::<2, 2>::new_with_rng(&mut rng);
+    let flat = A.0.iter().flatten().collect::<Vec<&f32>>();
+
+    assert_mostly_eq(-0.51739, *flat[0], 0.005);
+    assert_mostly_eq(-0.28923, *flat[1], 0.005);
+    assert_mostly_eq(0.353215, *flat[2], 0.005);
+    assert_mostly_eq(-0.12666, *flat[3], 0.005);
 }
 
 impl<const N: usize, const M: usize> Matrix<N, M> {
@@ -22,6 +36,17 @@ impl<const N: usize, const M: usize> Matrix<N, M> {
         */
         let m: Vec<[f32; M]> = (0..N).map(|_| [0f32; M]).collect();
         Self(m.try_into().unwrap())
+    }
+
+    fn new_with_rng(rng: &mut SmallRng) -> Self {
+        let m: Vec<[f32; M]> = (0..N).map(|_| Self::gen_random_row(rng)).collect();
+        Self(m.try_into().unwrap())
+    }
+
+    fn gen_random_row(rng: &mut SmallRng) -> [f32; M] {
+        let mut rand = || rng.gen_range(-1.0..=1.0) as f32;
+        let v: Vec<f32> = (0..M).map(|_| rand()).collect();
+        v.try_into().unwrap()
     }
 
     fn times_vector(&self, v: &Vector<M>) -> Vector<N> {
