@@ -21,10 +21,7 @@ impl<const N: usize, const M: usize> Parameters<N, M> {
 }
 
 impl Network {
-    fn new(layout: &'static [usize]) -> Self {
-        let shifted = layout.iter().skip(1);
-        let base = layout.iter().take(shifted.len());
+    fn new() -> Self {
         todo!()
-        // base.zip(shifted).map(|(a, b)| )
     }
 }
