@@ -1,24 +1,14 @@
 use crate::math::{Matrix, Vector};
-use rand::rngs::SmallRng;
+use rand::{rngs::SmallRng, SeedableRng};
 
-struct Network {
-    rng: SmallRng,
-    layers: Vec<Box<dyn IsParameters>>,
+macro_rules! construct_network {
+    ($($layer_size:literal->$next_layer_size:literal),+) => {
+        type Layers = ($(Parameters<$layer_size, $next_layer_size>),+);
+    };
 }
 
-trait IsParameters {
-    fn inner(&self) -> &Self
-    where
-        Self: Sized;
-}
-
-impl<const N: usize, const M: usize> IsParameters for Parameters<N, M> {
-    fn inner(&self) -> &Self
-    where
-        Self: Sized,
-    {
-        self
-    }
+struct Network<L> {
+    layers: L,
 }
 
 struct Parameters<const N: usize, const M: usize> {
@@ -35,14 +25,18 @@ impl<const N: usize, const M: usize> Parameters<N, M> {
     }
 }
 
-impl Network {
-    fn new() -> Self {
-        todo!()
+impl<L> Network<L> {
+    fn new(layers: L) -> Self {
+        Self { layers }
     }
+}
 
-    fn add_layer<const N: usize, const M: usize>(&mut self) {
-        let p = Parameters::<N, M>::new_with_rng(&mut self.rng);
-        let p_box = Box::new(p) as Box<dyn IsParameters>;
-        self.layers.push(p_box);
-    }
+fn some_fun() {
+    let mut rng = SmallRng::seed_from_u64(69);
+    construct_network!(1->3,3->1);
+    let layers: Layers = (
+        Parameters::<1, 3>::new_with_rng(&mut rng),
+        Parameters::<3, 1>::new_with_rng(&mut rng),
+    );
+    let net = Network::<Layers>::new(layers);
 }
