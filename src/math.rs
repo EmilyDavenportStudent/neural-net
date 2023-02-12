@@ -13,7 +13,7 @@ fn times_vector_test() {
 }
 
 #[test]
-fn new_with_rng_test() {
+fn new_matrix_with_rng_test() {
     let mut rng = SmallRng::seed_from_u64(69);
     let A = Matrix::<2, 2>::new_with_rng(&mut rng);
     let flat = A.0.iter().flatten().collect::<Vec<&f32>>();
@@ -38,15 +38,9 @@ impl<const N: usize, const M: usize> Matrix<N, M> {
         Self(m.try_into().unwrap())
     }
 
-    fn new_with_rng(rng: &mut SmallRng) -> Self {
-        let m: Vec<[f32; M]> = (0..N).map(|_| Self::gen_random_row(rng)).collect();
+    pub fn new_with_rng(rng: &mut SmallRng) -> Self {
+        let m: Vec<[f32; M]> = (0..N).map(|_| gen_random_array::<M>(rng)).collect();
         Self(m.try_into().unwrap())
-    }
-
-    fn gen_random_row(rng: &mut SmallRng) -> [f32; M] {
-        let mut rand = || rng.gen_range(-1.0..=1.0) as f32;
-        let v: Vec<f32> = (0..M).map(|_| rand()).collect();
-        v.try_into().unwrap()
     }
 
     fn times_vector(&self, v: &Vector<M>) -> Vector<N> {
@@ -69,11 +63,29 @@ fn assert_mostly_eq(a: f32, b: f32, epsilon: f32) {
     assert!(delta <= epsilon);
 }
 
+#[test]
+fn new_vec_with_rng_test() {
+    let mut rng = SmallRng::seed_from_u64(69);
+    let v = Vector::<2>::new_with_rng(&mut rng);
+    assert_mostly_eq(-0.28923, v.0[1], 0.005);
+    assert_mostly_eq(-0.51739, v.0[0], 0.005);
+}
+
 impl<const N: usize> Vector<N> {
+    pub fn new_with_rng(rng: &mut SmallRng) -> Self {
+        Self(gen_random_array::<N>(rng))
+    }
+
     fn plus_vector(&self, v: &Vector<N>) -> Vector<N> {
         let sum: Vec<f32> = self.0.iter().zip(v.0).map(|(x, y)| x + y).collect();
         Vector(sum.try_into().unwrap())
     }
+}
+
+fn gen_random_array<const N: usize>(rng: &mut SmallRng) -> [f32; N] {
+    let mut rand = || rng.gen_range(-1.0..=1.0) as f32;
+    let v: Vec<f32> = (0..N).map(|_| rand()).collect();
+    v.try_into().unwrap()
 }
 
 #[test]
