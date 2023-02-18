@@ -1,3 +1,4 @@
+mod colors;
 mod math;
 mod net;
 use rand::rngs::SmallRng;
