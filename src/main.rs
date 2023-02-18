@@ -1,6 +1,5 @@
-mod colors;
-mod math;
-mod net;
+mod matrix;
+mod vector;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::f32::consts::E;
