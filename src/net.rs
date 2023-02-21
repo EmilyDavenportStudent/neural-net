@@ -7,8 +7,18 @@ struct Network {
 }
 
 struct Parameters {
-    weights: Matrix,
-    biases: Vector,
+    pub weights: Matrix,
+    pub biases: Vector,
+}
+
+struct Deltas {
+    weights: Vec<Matrix>,
+    biases: Vec<Vector>,
+}
+
+struct LayerOutput {
+    pub a: Vector,
+    pub z: Vector,
 }
 
 impl Parameters {
@@ -24,6 +34,20 @@ impl Network {
     fn new(layers: Vec<Parameters>) -> Self {
         Self { layers }
     }
+
+    fn backpropagate(&self, input: &Vector, expected_output: &Vector) -> Deltas {
+        todo!();
+    }
+
+    fn feed_forward(p: &Parameters, input: &Vector) -> LayerOutput {
+        let a = p.weights.times_vector(input).plus(&p.biases);
+        let z = sigmoid(&a);
+        return LayerOutput { a, z };
+    }
+}
+
+fn sigmoid(x: &Vector) -> Vector {
+    todo!();
 }
 
 fn some_fun() {
