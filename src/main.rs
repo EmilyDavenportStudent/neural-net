@@ -1,4 +1,5 @@
 mod matrix;
+mod net;
 mod vector;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};

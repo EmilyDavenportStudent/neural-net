@@ -4,7 +4,7 @@ use std::ops::Index;
 pub struct Vector(Vec<f32>);
 
 impl Vector {
-    pub fn new_from_rng(rng: &mut SmallRng, size: usize) -> Self {
+    pub fn new_with_rng(rng: &mut SmallRng, size: usize) -> Self {
         let contents: Vec<f32> = (0..size).map(|_| rng.gen_range(-1.0..=1.0)).collect();
         Self(contents)
     }
@@ -41,9 +41,9 @@ pub fn dot(a: &Vec<f32>, b: &Vec<f32>) -> f32 {
 }
 
 #[test]
-fn test_new_from_rng() {
+fn test_new_with_rng() {
     let mut rng = SmallRng::seed_from_u64(0);
-    let v = Vector::new_from_rng(&mut rng, 3);
+    let v = Vector::new_with_rng(&mut rng, 3);
     assert_mostly_eq(-0.10534, v[0], 0.005);
     assert_mostly_eq(-0.12171, v[1], 0.005);
     assert_mostly_eq(0.95976, v[2], 0.005);

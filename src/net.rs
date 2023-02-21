@@ -1,42 +1,36 @@
-use crate::math::{Matrix, Vector};
+use crate::matrix::Matrix;
+use crate::vector::Vector;
 use rand::{rngs::SmallRng, SeedableRng};
 
-macro_rules! construct_network {
-    ($($layer_size:literal->$next_layer_size:literal),+) => {
-        type Layers = ($(Parameters<$layer_size, $next_layer_size>),+);
-    };
+struct Network {
+    layers: Vec<Parameters>,
 }
 
-struct Network<L> {
-    layers: L,
+struct Parameters {
+    weights: Matrix,
+    biases: Vector,
 }
 
-struct Parameters<const N: usize, const M: usize> {
-    weights: Matrix<N, M>,
-    biases: Vector<N>,
-}
-
-impl<const N: usize, const M: usize> Parameters<N, M> {
-    fn new_with_rng(rng: &mut SmallRng) -> Self {
+impl Parameters {
+    fn new_with_rng(rng: &mut SmallRng, n0_size: usize, n1_size: usize) -> Self {
         Self {
-            weights: Matrix::<N, M>::new_with_rng(rng),
-            biases: Vector::<N>::new_with_rng(rng),
+            weights: Matrix::new_with_rng(rng, n1_size, n0_size),
+            biases: Vector::new_with_rng(rng, n1_size),
         }
     }
 }
 
-impl<L> Network<L> {
-    fn new(layers: L) -> Self {
+impl Network {
+    fn new(layers: Vec<Parameters>) -> Self {
         Self { layers }
     }
 }
 
 fn some_fun() {
     let mut rng = SmallRng::seed_from_u64(69);
-    construct_network!(1->3,3->1);
-    let layers: Layers = (
-        Parameters::<1, 3>::new_with_rng(&mut rng),
-        Parameters::<3, 1>::new_with_rng(&mut rng),
-    );
-    let net = Network::<Layers>::new(layers);
+    let layers = vec![
+        Parameters::new_with_rng(&mut rng, 1, 3),
+        Parameters::new_with_rng(&mut rng, 3, 1),
+    ];
+    let net = Network::new(layers);
 }
