@@ -1,7 +1,7 @@
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 use std::ops::Index;
 
-pub struct Vector(Vec<f32>);
+pub struct Vector(pub(crate) Vec<f32>);
 
 impl Vector {
     pub fn new_with_rng(rng: &mut SmallRng, size: usize) -> Self {

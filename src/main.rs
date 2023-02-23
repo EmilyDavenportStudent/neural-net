@@ -1,3 +1,4 @@
+mod activation;
 mod matrix;
 mod net;
 mod vector;
