@@ -1,3 +1,4 @@
+use crate::activation::Activator;
 use crate::matrix::Matrix;
 use crate::vector::Vector;
 use rand::{rngs::SmallRng, SeedableRng};
@@ -39,15 +40,11 @@ impl Network {
         todo!();
     }
 
-    fn feed_forward(p: &Parameters, input: &Vector) -> LayerOutput {
+    fn feed_forward<T: Activator>(p: &Parameters, input: &Vector) -> LayerOutput {
         let a = p.weights.times_vector(input).plus(&p.biases);
-        let z = sigmoid(&a);
+        let z = <T as Activator>::activation_vec(&a);
         return LayerOutput { a, z };
     }
-}
-
-fn sigmoid(x: &Vector) -> Vector {
-    todo!();
 }
 
 fn some_fun() {
