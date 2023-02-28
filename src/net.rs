@@ -1,10 +1,11 @@
-use crate::activation::Activator;
+use crate::activation::{Activator, ReLU};
 use crate::matrix::Matrix;
 use crate::vector::Vector;
 use rand::{rngs::SmallRng, SeedableRng};
 
-struct Network {
+struct Network<T: Activator> {
     layers: Vec<Parameters>,
+    activation: T,
 }
 
 struct Parameters {
@@ -17,11 +18,6 @@ struct Deltas {
     biases: Vec<Vector>,
 }
 
-struct LayerOutput {
-    pub a: Vector,
-    pub z: Vector,
-}
-
 impl Parameters {
     fn new_with_rng(rng: &mut SmallRng, n0_size: usize, n1_size: usize) -> Self {
         Self {
@@ -31,20 +27,43 @@ impl Parameters {
     }
 }
 
-impl Network {
-    fn new(layers: Vec<Parameters>) -> Self {
-        Self { layers }
+impl<T> Network<T>
+where
+    T: crate::activation::Activator,
+{
+    fn new(layers: Vec<Parameters>, activation: T) -> Self {
+        Self { layers, activation }
     }
 
     fn backpropagate(&self, input: &Vector, expected_output: &Vector) -> Deltas {
-        todo!();
+        let (a, z) = self.feed_all_forward(input);
+        dbg!(a);
+        dbg!(z);
+        todo!()
     }
 
-    fn feed_forward<T: Activator>(p: &Parameters, input: &Vector) -> LayerOutput {
+    // ugly function but rust doesn't have good generator function syntax yet
+    fn feed_all_forward(&self, input: &Vector) -> (Vec<Vector>, Vec<Vector>) {
+        let mut outputs = Vec::<(Vector, Vector)>::with_capacity(self.layers.len());
+        let mut prev_activation = input.clone();
+        for layer in &self.layers {
+            let output = Self::feed_forward(&layer, &prev_activation);
+            prev_activation = output.0.clone();
+            outputs.push(output);
+        }
+        outputs.into_iter().unzip()
+    }
+
+    fn feed_forward(p: &Parameters, input: &Vector) -> (Vector, Vector) {
         let a = p.weights.times_vector(input).plus(&p.biases);
         let z = <T as Activator>::activation_vec(&a);
-        return LayerOutput { a, z };
+        (a, z)
     }
+}
+
+#[test]
+fn some_test_fun() {
+    some_fun()
 }
 
 fn some_fun() {
@@ -53,5 +72,6 @@ fn some_fun() {
         Parameters::new_with_rng(&mut rng, 1, 3),
         Parameters::new_with_rng(&mut rng, 3, 1),
     ];
-    let net = Network::new(layers);
+    let net = Network::new(layers, ReLU);
+    net.backpropagate(&Vector::from(vec![3.4]), &Vector::from(vec![1.0]));
 }

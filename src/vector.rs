@@ -1,6 +1,7 @@
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 use std::ops::Index;
 
+#[derive(Clone, Debug)]
 pub struct Vector(pub(crate) Vec<f32>);
 
 impl Vector {
