@@ -1,8 +1,8 @@
+use crate::activation::FnActivation;
 use crate::activation::{Activator, ReLU};
 use crate::matrix::Matrix;
 use crate::vector::Vector;
 use rand::{rngs::SmallRng, SeedableRng};
-use std::collections::LinkedList;
 use std::iter::Iterator;
 
 struct Network<T: Activator> {
@@ -38,7 +38,7 @@ where
     }
 
     fn backpropagate(&self, input: &Vector, expected_output: &Vector) -> Deltas {
-        let list = feed_forward_recursive::<ReLU>(self.layers.iter(), input);
+        let list = feed_forward_recursive(self.layers.iter(), input, ReLU::activation_vec);
         dbg!(list);
         todo!()
     }
@@ -70,20 +70,18 @@ enum FeedForwardList {
 
 use FeedForwardList::{Cons, Nil};
 
-fn feed_forward_recursive<'a, F>(
+fn feed_forward_recursive<'a>(
     mut layers: impl Iterator<Item = &'a Parameters>,
     input: &Vector,
-) -> FeedForwardList
-where
-    F: Activator,
-{
+    activation: FnActivation,
+) -> FeedForwardList {
     match layers.next() {
         Some(p) => {
             let a = p.weights.times_vector(input).plus(&p.biases);
-            let z: Vector = <F as Activator>::activation_vec(&a);
+            let z: Vector = activation(&a);
             Cons(
                 (a, z.clone()),
-                Box::new(feed_forward_recursive::<F>(layers, &z)),
+                Box::new(feed_forward_recursive(layers, &z, activation)),
             )
         }
         None => Nil,

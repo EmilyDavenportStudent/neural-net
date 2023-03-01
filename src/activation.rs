@@ -12,6 +12,8 @@ pub trait Activator {
     }
 }
 
+pub type FnActivation = fn(&Vector) -> Vector;
+
 pub struct Sigmoid;
 impl Activator for Sigmoid {
     fn activation(x: f32) -> f32 {
