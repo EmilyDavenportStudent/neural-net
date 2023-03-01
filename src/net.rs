@@ -38,7 +38,7 @@ where
     }
 
     fn backpropagate(&self, input: &Vector, expected_output: &Vector) -> Deltas {
-        let list = feed_forward_recursive(self.layers.iter(), input, ReLU::activation_vec);
+        let list = feed_forward_recursive(self.layers.iter(), input, ReLU::activation);
         dbg!(list);
         todo!()
     }
@@ -57,24 +57,24 @@ where
 
     fn feed_forward(p: &Parameters, input: &Vector) -> (Vector, Vector) {
         let a = p.weights.times_vector(input).plus(&p.biases);
-        let z = <T as Activator>::activation_vec(&a);
+        let z = <T as Activator>::activation(&a);
         (a, z)
     }
 }
 
 #[derive(Debug)]
-enum FeedForwardList {
-    Cons((Vector, Vector), Box<FeedForwardList>),
+enum List<T> {
+    Cons(T, Box<List<T>>),
     Nil,
 }
 
-use FeedForwardList::{Cons, Nil};
+use List::{Cons, Nil};
 
 fn feed_forward_recursive<'a>(
     mut layers: impl Iterator<Item = &'a Parameters>,
     input: &Vector,
     activation: FnActivation,
-) -> FeedForwardList {
+) -> List<(Vector, Vector)> {
     match layers.next() {
         Some(p) => {
             let a = p.weights.times_vector(input).plus(&p.biases);
