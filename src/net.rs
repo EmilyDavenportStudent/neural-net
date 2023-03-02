@@ -1,5 +1,5 @@
-use crate::activation::FnActivation;
-use crate::activation::{Activator, ReLU};
+use crate::activation::{Activator, FnActivation, ReLU};
+use crate::loss::{mean_squared_error, FnLoss};
 use crate::matrix::Matrix;
 use crate::vector::Vector;
 use rand::{rngs::SmallRng, SeedableRng};
@@ -8,6 +8,7 @@ use std::iter::Iterator;
 struct Network<T: Activator> {
     layers: Vec<Parameters>,
     activation: T,
+    loss: FnLoss,
 }
 
 struct Parameters {
@@ -33,32 +34,18 @@ impl<T> Network<T>
 where
     T: crate::activation::Activator,
 {
-    fn new(layers: Vec<Parameters>, activation: T) -> Self {
-        Self { layers, activation }
+    fn new(layers: Vec<Parameters>, activation: T, loss: FnLoss) -> Self {
+        Self {
+            layers,
+            activation,
+            loss,
+        }
     }
 
     fn backpropagate(&self, input: &Vector, expected_output: &Vector) -> Deltas {
         let list = feed_forward_recursive(self.layers.iter(), input, ReLU::activation);
         dbg!(list);
         todo!()
-    }
-
-    // ugly function but rust doesn't have good generator function syntax yet
-    fn feed_all_forward(&self, input: &Vector) -> (Vec<Vector>, Vec<Vector>) {
-        let mut outputs = Vec::<(Vector, Vector)>::with_capacity(self.layers.len());
-        let mut prev_activation = input.clone();
-        for layer in &self.layers {
-            let output = Self::feed_forward(&layer, &prev_activation);
-            prev_activation = output.0.clone();
-            outputs.push(output);
-        }
-        outputs.into_iter().unzip()
-    }
-
-    fn feed_forward(p: &Parameters, input: &Vector) -> (Vector, Vector) {
-        let a = p.weights.times_vector(input).plus(&p.biases);
-        let z = <T as Activator>::activation(&a);
-        (a, z)
     }
 }
 
@@ -99,6 +86,6 @@ fn some_fun() {
         Parameters::new_with_rng(&mut rng, 1, 3),
         Parameters::new_with_rng(&mut rng, 3, 1),
     ];
-    let net = Network::new(layers, ReLU);
+    let net = Network::new(layers, ReLU, mean_squared_error);
     net.backpropagate(&Vector::from(vec![3.4]), &Vector::from(vec![1.0]));
 }

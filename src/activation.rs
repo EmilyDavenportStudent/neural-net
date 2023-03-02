@@ -14,6 +14,10 @@ pub trait Activator {
     }
 }
 
+fn as_vec_operation(scalar_activation: fn(f32) -> f32) -> impl Fn(&Vector) -> Vector {
+    move |v: &Vector| Vector::from(v.0.iter().map(|x: &f32| scalar_activation(*x)).collect())
+}
+
 pub struct Sigmoid;
 impl Activator for Sigmoid {
     fn activation_scalar(x: f32) -> f32 {
