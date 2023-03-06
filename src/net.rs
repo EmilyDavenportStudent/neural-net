@@ -57,6 +57,27 @@ enum List<T> {
 
 use List::{Cons, Nil};
 
+fn reverse<T>(l: List<T>) -> List<T> {
+    reverse_accumulator(l, Nil)
+}
+
+fn reverse_accumulator<T>(l: List<T>, acc: List<T>) -> List<T> {
+    match l {
+        Nil => acc,
+        Cons(car, cdr) => reverse_accumulator(*cdr, Cons(car, Box::new(acc))),
+    }
+}
+
+#[test]
+fn test_reverse() {
+    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
+    let rev = reverse(list);
+    match rev {
+        Cons(car, cdr) => assert_eq!(3, car),
+        Nil => panic!(),
+    }
+}
+
 fn feed_forward_recursive<'a>(
     mut layers: impl Iterator<Item = &'a Parameters>,
     input: &Vector,
@@ -75,6 +96,15 @@ fn feed_forward_recursive<'a>(
     }
 }
 
+fn backward_pass_recursive<'a>(
+    mut layers: impl Iterator<Item = &'a Parameters>,
+    expected_output: &Vector,
+    loss: FnLoss,
+    activation_dx: FnActivation,
+) -> Deltas {
+    todo!()
+}
+
 #[test]
 fn some_test_fun() {
     some_fun()
@@ -84,8 +114,8 @@ fn some_fun() {
     let mut rng = SmallRng::seed_from_u64(69);
     let layers = vec![
         Parameters::new_with_rng(&mut rng, 1, 3),
-        Parameters::new_with_rng(&mut rng, 3, 1),
+        Parameters::new_with_rng(&mut rng, 3, 2),
     ];
     let net = Network::new(layers, ReLU, mean_squared_error);
-    net.backpropagate(&Vector::from(vec![3.4]), &Vector::from(vec![1.0]));
+    net.backpropagate(&Vector::from(vec![3.4]), &Vector::from(vec![1.0, 2.0]));
 }
