@@ -68,6 +68,31 @@ fn reverse_accumulator<T>(l: List<T>, acc: List<T>) -> List<T> {
     }
 }
 
+struct ListIter<'a, T>(&'a List<T>);
+
+impl<'a, T> Iterator for ListIter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.0 {
+            Cons(car, cdr) => {
+                self.0 = &*cdr;
+                Some(car)
+            }
+            Nil => None,
+        }
+    }
+}
+
+#[test]
+fn test_iterate() {
+    let list = Cons(1, Box::new(Cons(2, Box::new(Nil))));
+    let mut iter = ListIter(&list);
+    dbg!(iter.next());
+    dbg!(iter.next());
+    dbg!(iter.next());
+}
+
 #[test]
 fn test_reverse() {
     let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
