@@ -32,6 +32,10 @@ impl Vector {
     pub fn len(&self) -> usize {
         self.0.len()
     }
+
+    pub fn times_scalar(&self, s: f32) -> Vector {
+        Vector(self.0.iter().map(|x| x * s).collect())
+    }
 }
 
 pub fn dot(a: &Vec<f32>, b: &Vec<f32>) -> f32 {
@@ -64,6 +68,15 @@ fn dot_test() {
     let a = Vector(vec![6.3, 4.1]);
     let b = Vector(vec![1.2, 9.8]);
     assert_eq!(47.74, a.dot(&b));
+}
+
+#[test]
+fn test_times_scalar() {
+    let v = Vector::from(vec![2.3, -1.8]);
+    let s = 5.5;
+    let result = v.times_scalar(s);
+    assert_mostly_eq(12.65, result[0], 0.005);
+    assert_mostly_eq(-9.9, result[1], 0.005);
 }
 
 impl Index<usize> for Vector {
