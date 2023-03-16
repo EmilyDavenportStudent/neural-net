@@ -29,6 +29,10 @@ impl Vector {
         dot(&self.0, &v)
     }
 
+    pub fn times_elementwise(&self, v: &Vector) -> Vector {
+        Vector(self.0.iter().zip(&v.0).map(|(x, y)| x * y).collect())
+    }
+
     pub fn len(&self) -> usize {
         self.0.len()
     }
@@ -68,6 +72,15 @@ fn dot_test() {
     let a = Vector(vec![6.3, 4.1]);
     let b = Vector(vec![1.2, 9.8]);
     assert_eq!(47.74, a.dot(&b));
+}
+
+#[test]
+fn test_times_elementwise() {
+    let a = Vector(vec![3., 4.]);
+    let b = Vector(vec![6., -3.]);
+    let result = a.times_elementwise(&b);
+    assert_mostly_eq(18., result[0], 0.005);
+    assert_mostly_eq(-12., result[1], 0.005);
 }
 
 #[test]
